@@ -1,6 +1,6 @@
 
 module.exports = {
-  publicPath: '/dist/',
+  publicPath: '/fantasy-football-app/dist/',
   transpileDependencies: ['vuetify'],
  
 }
