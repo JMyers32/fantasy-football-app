@@ -1,3 +1,6 @@
-module.exports={
-  publicPath: './'
+
+module.exports = {
+  publicPath: '/dist/',
+  transpileDependencies: ['vuetify'],
+ 
 }

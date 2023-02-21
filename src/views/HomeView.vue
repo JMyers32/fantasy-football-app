@@ -60,7 +60,7 @@ import ProfileService from '@/services/ProfileService'
 
 <style scoped>
 .home{
-  background-image: url('../assets/harambe\ surfing.png');
+  background-image: url('../assets/harambe surfing.png');
   background-size: cover;
   background-position: center;
   height:100vh;
