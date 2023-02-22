@@ -36,9 +36,10 @@
     <v-img  class="pic" v-else :src="profile.profilePicture"  alt="User Profile Picture"  ></v-img>
   </v-avatar>
     <v-card-title class="mt-5" style="font-size:xx-large">{{ profile.displayName }}</v-card-title>
-    <v-card-subtitle class="mt-5" style="font-size:x-large; color:black; margin-bottom: 2vh; color:lightblue;" >Karma: {{totalKarma()}}</v-card-subtitle>
+    <div style="margin-top:3vh;">
     <v-btn x-large v-if="profile.profileId==0" @click="createOverlay=true">Create Profile</v-btn>
     <v-btn x-large v-else @click="editOverlay=true" >Update Profile</v-btn>
+  </div>
     <!-- Create Profile Overlay -->
     <v-overlay v-if="createOverlay" :value="true">  
       <v-card style="width:50vw">
@@ -103,7 +104,7 @@ data(){
 created(){
 ProfileService.getProfile().then((response)=>{
   this.profile=response.data;
-  this.totalKarma();
+
 })
 
 PostService.getPostsFromUser().then((response)=>{
@@ -137,23 +138,7 @@ methods:{
             }
         })
     },
-    totalKarma(){
-  let totalPostKarma=0;
-  let totalCommentKarma=0;
-  
-  for(let i=0;i<this.allUserPosts.length;i++){
-    totalPostKarma+=Number.parseInt(this.allUserPosts[i].karma);
-  }
-  for(let i=0;i<this.allUserComments.length;i++){
-    totalCommentKarma+=Number.parseInt(this.allUserComments[i].karma);
-  }
-  console.log(totalCommentKarma)
-  console.log(totalPostKarma)
-  let allKarma=totalPostKarma+totalCommentKarma;
-  this.profile.karma=allKarma;
-  ProfileService.updateProfile(this.profile);
-  return allKarma;
- }
+ 
 }
 }
 </script>

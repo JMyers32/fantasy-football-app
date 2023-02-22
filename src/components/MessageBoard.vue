@@ -2,18 +2,9 @@
     <v-container > 
       <v-row style="margin-left:13vw;" class="fill-height">
         <v-col cols="12" sm="6" md="4">
-      <v-btn  @click="showLeaderOverlay=true" width="20vw" height="7vh" class="airBtn" style="margin-left:-10vw;" rounded>Leader Board</v-btn>
-      </v-col>
-        <v-col cols="12" sm="6" md="4">
       <v-btn  @click="showPostOverlay=true" width="20vw" height="7vh" class="airBtn" rounded>Air A Grievance</v-btn>
       </v-col>
     </v-row>
-    <v-overlay v-if="showLeaderOverlay" :value="true" outlined style="margin-top:-50vh">
-      <v-card>
-      <v-btn icon @click="showLeaderOverlay=false"><v-icon>mdi-close</v-icon></v-btn> 
-    <leader-board/>
-  </v-card>
-    </v-overlay>
     <!-- create post overlay -->
       <v-overlay v-if="showPostOverlay" :value="true">
         <v-card style="width:50vw;" outlined>
@@ -36,7 +27,7 @@
         <v-textarea v-model="newPost.post" label="Air Your Grievance" auto-grow row="5" class="postArea" outlined>  
         </v-textarea>  
     </v-card-actions>
-    <v-btn  @click="addPost(newPost); showPostOverlay=false;">Complain</v-btn>
+    <v-btn  @click="addPost(newPost); showPostOverlay=false;" :disabled="newPost.post==null">Complain</v-btn>
   </v-card>
     </v-overlay>
     <!--  --> 
@@ -73,7 +64,7 @@
       <v-overlay v-if="showOverlay" :value="true">
       <v-card  outlined style="width:50vw;max-height: 80vh; overflow-y: auto; ">
         <v-card>
-        <v-btn icon @click="showOverlay=false"><v-icon>mdi-close</v-icon></v-btn>
+        <v-btn icon @click="closeCommentOverlay(newComment)"><v-icon>mdi-close</v-icon></v-btn>
         <v-card-title id="posterName"><v-avatar>
           <v-img :src=displayPicture(selectedPost.userId)></v-img>&nbsp;
         </v-avatar>{{displayName(selectedPost.userId)}}</v-card-title>
@@ -93,7 +84,7 @@
         <v-textarea v-model="newComment.response" label="Comment" auto-grow row="5" class="postArea" outlined>
         </v-textarea>
       </v-card-actions>
-      <v-btn @click="addComment(newComment)" color="blue" style="margin-top:-4vh;margin-left:.5vw;">Comment</v-btn>
+      <v-btn @click="addComment(newComment)" color="blue" style="margin-top:-4vh;margin-left:.5vw;" :disabled="newComment.response=null">Comment</v-btn>
       <v-card v-for="comment in comments" :key="comment.commentId" outlined >
       <v-card-title id="posterName"><v-avatar>
           <v-img :src=displayPicture(comment.userId)></v-img>&nbsp;
@@ -123,14 +114,10 @@
 import PostService from '@/services/PostService';
 import CommentService from '@/services/CommentService';
 import ProfileService from '@/services/ProfileService';
-import LeaderBoard from './LeaderBoard.vue';
+
 
 export default {
-  components:{
-    LeaderBoard
-   
-
-  },
+ 
 name:'message-board',
 data(){
   return{
@@ -141,7 +128,6 @@ data(){
     newComment:{},
     allProfiles:[],
     showOverlay:false,
-    showLeaderOverlay:false,
     selectedPost:null,
     showPostOverlay:false,
     allComments:[],
@@ -188,6 +174,7 @@ displayPosts(){
 },
 
 methods:{
+ 
   onScroll(){
   const scrollY=window.scrollY;
   const visibleHeight=window.innerHeight;
@@ -282,24 +269,25 @@ methods:{
     if (response.status == 200) {
       const index = this.posts.findIndex((p) => p.postId === post.postId);
       this.posts.splice(index, 1, post);
+    
+      
     } else {
-     
       console.error('Failed to update post karma.');
     }
   });
-  
 },
+
 decreasePostKarma(post) {
   post.karma -= 1;
   PostService.updatePost(post).then((response) => {
     if (response.status == 200) {
       const index = this.posts.findIndex((p) => p.postId === post.postId);
       this.posts.splice(index, 1, post);
+     
     } else {
       console.error('Failed to update post karma.');
     }
   });
-  
 },
 editComment(id,comment){
  CommentService.updateComment(id,comment).then((response)=>{
@@ -316,29 +304,28 @@ deleteAComment(id){
   }
  })
 },
-increaseCommentKarma(id,comment) {
+increaseCommentKarma(id, comment) {
   comment.karma += 1;
-  CommentService.updateComment(id,comment).then((response) => {
+  CommentService.updateComment(id, comment).then((response) => {
     if (response.status == 200) {
       const index = this.comments.findIndex((c) => c.commentId === comment.commentId);
       this.comments.splice(index, 1, comment);
     } else {
-     
       console.error('Failed to update post karma.');
     }
-  });
+    });
 },
-decreaseCommentKarma(id,comment) {
+
+decreaseCommentKarma(id, comment) {
   comment.karma -= 1;
-  CommentService.updateComment(id,comment).then((response) => {
+  CommentService.updateComment(id, comment).then((response) => {
     if (response.status == 200) {
       const index = this.comments.findIndex((c) => c.commentId === comment.commentId);
       this.comments.splice(index, 1, comment);
     } else {
-     
       console.error('Failed to update post karma.');
     }
-  });
+    });
 },
 getYoutubeEmbedUrl(url) {
       // Extract the video ID from the URL
@@ -363,8 +350,12 @@ getYoutubeEmbedUrl(url) {
     closePostOverlay() {
       this.activeTab = null;
       this.showPostOverlay = false;
-      
+      this.newPost.post=null;  
   },
+  closeCommentOverlay(comment){
+    this.showOverlay=false;
+    comment.response=null;
+  }
 
 },
 
